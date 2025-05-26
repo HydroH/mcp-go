@@ -476,6 +476,8 @@ type Tool struct {
 	InputSchema ToolInputSchema `json:"inputSchema"`
 	// Alternative to InputSchema - allows arbitrary JSON Schema to be provided
 	RawInputSchema json.RawMessage `json:"-"` // Hide this from JSON marshaling
+	// A JSON Schema object defining the expected output of the tool.
+	RawOutputSchema json.RawMessage `json:"-"` // Hide this from JSON marshaling
 	// Optional properties describing tool behavior
 	Annotations ToolAnnotation `json:"annotations"`
 }
@@ -506,6 +508,11 @@ func (t Tool) MarshalJSON() ([]byte, error) {
 	} else {
 		// Use the structured InputSchema
 		m["inputSchema"] = t.InputSchema
+	}
+
+	// Add the raw output schema if it exists
+	if t.RawOutputSchema != nil {
+		m["outputSchema"] = t.RawOutputSchema
 	}
 
 	m["annotations"] = t.Annotations
@@ -595,11 +602,12 @@ func NewTool(name string, opts ...ToolOption) Tool {
 // NOTE a [Tool] built in such a way is incompatible with the [ToolOption] and
 // runtime errors will result from supplying a [ToolOption] to a [Tool] built
 // with this function.
-func NewToolWithRawSchema(name, description string, schema json.RawMessage) Tool {
+func NewToolWithRawSchema(name, description string, inputSchema, outputSchema json.RawMessage) Tool {
 	tool := Tool{
-		Name:           name,
-		Description:    description,
-		RawInputSchema: schema,
+		Name:            name,
+		Description:     description,
+		RawInputSchema:  inputSchema,
+		RawOutputSchema: outputSchema,
 	}
 
 	return tool
