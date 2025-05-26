@@ -621,6 +621,13 @@ func WithDescription(description string) ToolOption {
 	}
 }
 
+// WithRawOutputSchema adds a raw JSON Schema for the tool's output.
+func WithRawOutputSchema(schema json.RawMessage) ToolOption {
+	return func(t *Tool) {
+		t.RawOutputSchema = schema
+	}
+}
+
 // WithToolAnnotation adds optional hints about the Tool.
 func WithToolAnnotation(annotation ToolAnnotation) ToolOption {
 	return func(t *Tool) {
